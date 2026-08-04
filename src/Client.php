@@ -20,6 +20,12 @@ class Client
     const VERSION = 3.0;
     
     /**
+     * Base Urls.
+     */
+    const BASE_URL_LIVE = 'https://restapi.simplymail.quadient.nl';
+    const BASE_URL_TEST = 'https://sandbox.simplymail.quadient.nl';
+    
+    /**
      * Methods.
      */
     const METHOD_GET = 'GET';
@@ -67,6 +73,7 @@ class Client
         $this->username = $username;
         $this->password = $password;
         $this->version = $version;
+        $this->testModus = $testModus;
     }
     
     /**
@@ -112,6 +119,14 @@ class Client
     public function getToken(): ?Token
     {
         return $this->token;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getBaseUrl(): string
+    {
+        return $this->testModus ? self::BASE_URL_TEST : self::BASE_URL_LIVE;
     }
     
     /**
@@ -175,7 +190,7 @@ class Client
         
         // build guzzle client
         $guzzleClient = new GuzzleClient([
-            'base_uri' => 'https://restapi.simplymail.quadient.nl'
+            'base_uri' => $this->getBaseUrl()
         ]);
         
         // build guzzle request
@@ -216,5 +231,36 @@ class Client
     public function getLabels(array $data): ?array
     {
         return $this->request(self::METHOD_POST, '/parcel/label', $data);
+    }
+    
+    /**
+     * @param string $zipCode
+     * @param string $countryCode = 'NL'
+     * 
+     * @return array|null
+     */
+    public function getPickupPoints(string $zipCode, string $countryCode = 'NL'): ?array
+    {
+        return $this->request(self::METHOD_GET, "/parcel/pickup/$countryCode/$zipCode");
+    }
+    
+    /**
+     * @param string $countryCode = 'NL'
+     * 
+     * @return array|null
+     */
+    public function getProducts(string $countryCode = 'NL'): ?array
+    {
+        return $this->request(self::METHOD_GET, "/parcel/products/$countryCode");
+    }
+    
+    /**
+     * @param string $barcode
+     * 
+     * @return array|null
+     */
+    public function getStatus(string $barcode): ?array
+    {
+        return $this->request(self::METHOD_GET, "/parcel/status/$barcode");
     }
 }

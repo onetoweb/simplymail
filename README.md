@@ -8,4 +8,9 @@ composer require onetoweb/frama
 
 ## Usage
 
-See example.php
+See [Documentation](docs/index.rst)
+
+
+## API Documentation
+
+See [API Documentation](https://developer.simplymail.quadient.nl)
