@@ -152,7 +152,7 @@ Get pickup points
 
 .. code-block:: php
     
-    $zipCode = '8261LR';
+    $zipCode = '4202MS';
     $countryCode = 'NL';
     $result = $client->getPickupPoints($zipCode, $countryCode);
 
