@@ -1,13 +1,14 @@
 {
-    "name": "onetoweb/frama",
-    "description": "Frama API Client",
+    "name": "onetoweb/simplymail",
+    "description": "Simplymail API Client",
     "keywords": [
         "api",
         "php",
-        "frama"
+        "frama",
+        "simplymail"
     ],
     "type": "library",
-    "homepage": "https://github.com/onetoweb/frama",
+    "homepage": "https://github.com/onetoweb/simplymail",
     "license": "MIT",
     "authors": [
         {

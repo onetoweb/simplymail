@@ -1,9 +1,9 @@
-# Onetoweb Frama API Client
+# Onetoweb Simplymail API Client
 
 ## Installing
 
 ```bash
-composer require onetoweb/frama
+composer require onetoweb/simplymail
 ```
 
 ## Usage
