@@ -4,8 +4,10 @@ namespace Onetoweb\Frama;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\RequestOptions;
+use Onetoweb\Frama\Config\Method;
 use Onetoweb\Frama\Token;
 use DateTime;
+use Closure;
 
 /**
  * Frama Api Client.
@@ -22,45 +24,18 @@ class Client
     /**
      * Base Urls.
      */
-    const BASE_URL_LIVE = 'https://restapi.simplymail.quadient.nl';
-    const BASE_URL_TEST = 'https://sandbox.simplymail.quadient.nl';
-    
-    /**
-     * Methods.
-     */
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_DELETE = 'DELETE';
-    
-    /**
-     * @var string
-     */
-    private $username;
-    
-    /**
-     * @var string
-     */
-    private $password;
-    
-    /**
-     * @var bool
-     */
-    private $testModus;
-    
-    /**
-     * @var float
-     */
-    private $version;
+    public const BASE_URL_LIVE = 'https://restapi.simplymail.quadient.nl';
+    public const BASE_URL_TEST = 'https://sandbox.simplymail.quadient.nl';
     
     /**
      * @var Token
      */
-    private $token;
+    private ?Token $token = null;
     
     /**
-     * @var callable 
+     * @var Closure|null
      */
-    private $updateTokenCallback;
+    private ?Closure $tokenUpdateCallback = null;
     
     /**
      * @param string $username
@@ -68,8 +43,17 @@ class Client
      * @param bool $testModus = false
      * @param float $version = self::VERSION
      */
-    public function __construct(string $username, string $password, bool $testModus = false, float $version = self::VERSION)
-    {
+    public function __construct(
+        
+        #[\SensitiveParameter]
+        private string $username,
+        
+        #[\SensitiveParameter]
+        private string $password,
+        
+        private bool $testModus = false,
+        private float $version = self::VERSION
+    ) {
         $this->username = $username;
         $this->password = $password;
         $this->version = $version;
@@ -81,7 +65,7 @@ class Client
      */
     public function requestToken(): void
     {
-        $response = $this->request(self::METHOD_GET, 'login');
+        $response = $this->request(Method::GET, 'login');
         
         // set expires
         $expires = new Datetime();
@@ -96,9 +80,9 @@ class Client
     }
     
     /**
-     * @param callable $updateTokenCallback
+     * @param Closure $updateTokenCallback
      */
-    public function setUpdateTokenCallback(callable $updateTokenCallback): void
+    public function setUpdateTokenCallback(Closure $updateTokenCallback): void
     {
         $this->updateTokenCallback = $updateTokenCallback;
     }
@@ -130,14 +114,14 @@ class Client
     }
     
     /**
-     * @param string $method
+     * @param Method $method
      * @param string $endpoint
      * @param array $data = []
      * @param array $query = []
      * 
      * @return array|null
      */
-    public function request(string $method, string $endpoint, array $data = [], array $query = []): ?array
+    public function request(Method $method, string $endpoint, array $data = [], array $query = []): ?array
     {
         // build options
         $options = [
@@ -194,7 +178,7 @@ class Client
         ]);
         
         // build guzzle request
-        $result = $guzzleClient->request($method, $endpoint, $options);
+        $result = $guzzleClient->request($method->value, $endpoint, $options);
         
         // get contents
         $contents = $result->getBody()->getContents();
@@ -210,7 +194,7 @@ class Client
      */
     public function createShipments(array $data): ?array
     {
-        return $this->request(self::METHOD_POST, 'parcel/shipment', $data);
+        return $this->request(Method::POST, 'parcel/shipment', $data);
     }
     
     /**
@@ -220,7 +204,7 @@ class Client
      */
     public function deleteShipments(array $data): ?array
     {
-        return $this->request(self::METHOD_DELETE, 'parcel/shipment', $data);
+        return $this->request(Method::DELETE, 'parcel/shipment', $data);
     }
     
     /**
@@ -230,7 +214,7 @@ class Client
      */
     public function getLabels(array $data): ?array
     {
-        return $this->request(self::METHOD_POST, '/parcel/label', $data);
+        return $this->request(Method::POST, '/parcel/label', $data);
     }
     
     /**
@@ -241,7 +225,7 @@ class Client
      */
     public function getPickupPoints(string $zipCode, string $countryCode = 'NL'): ?array
     {
-        return $this->request(self::METHOD_GET, "/parcel/pickup/$countryCode/$zipCode");
+        return $this->request(Method::GET, "/parcel/pickup/$countryCode/$zipCode");
     }
     
     /**
@@ -251,7 +235,7 @@ class Client
      */
     public function getProducts(string $countryCode = 'NL'): ?array
     {
-        return $this->request(self::METHOD_GET, "/parcel/products/$countryCode");
+        return $this->request(Method::GET, "/parcel/products/$countryCode");
     }
     
     /**
@@ -261,6 +245,6 @@ class Client
      */
     public function getStatus(string $barcode): ?array
     {
-        return $this->request(self::METHOD_GET, "/parcel/status/$barcode");
+        return $this->request(Method::GET, "/parcel/status/$barcode");
     }
 }
