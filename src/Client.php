@@ -19,7 +19,7 @@ use Closure;
  */
 class Client
 {
-    const VERSION = 3.0;
+    public const VERSION = '3.0';
     
     /**
      * Base Urls.
@@ -52,7 +52,7 @@ class Client
         private string $password,
         
         private bool $testModus = false,
-        private float $version = self::VERSION
+        private string $version = self::VERSION
     ) {
         $this->username = $username;
         $this->password = $password;
